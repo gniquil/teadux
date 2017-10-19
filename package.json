@@ -1,8 +1,13 @@
 {
   "name": "teadux",
-  "version": "1.0.2",
-  "descript": "The Elm archicture + Redux",
+  "version": "1.0.3",
+  "description": "The Elm archicture + Redux",
   "homepage": "https://github.com/gniquil/teadux",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gniquil/teadux.git"
+  },
+  "bugs": "https://github.com/gniquil/teadux/issues",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",

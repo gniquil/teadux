@@ -77,6 +77,8 @@ The list of `CmdType<A>` would be something that runs a http request, etc. (Docs
 
 ## Example
 
+You can find a full-fledged example [here](https://github.com/gniquil/teadux-example).
+
 ### Kitchen sink
 
 The following is an example from `index.test.ts`

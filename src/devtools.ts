@@ -25,7 +25,7 @@ export const makeStateSanitizer = (runtime: Runtime<any, any>) => (
       const { originalAction, cmds } = runtimeItem;
       return {
         ...state,
-        '@@dux': {
+        '@@teadux': {
           type: actionSanitizer(originalAction, runtime).type,
           cmds: cmds,
         },
@@ -33,7 +33,7 @@ export const makeStateSanitizer = (runtime: Runtime<any, any>) => (
     } else {
       return {
         ...state,
-        '@@dux': {},
+        '@@teadux': {},
       };
     }
   } else {

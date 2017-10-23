@@ -9,7 +9,7 @@ import {
 import { Runtime } from './runtime';
 import { CmdType, TeaReducer } from './types';
 
-export const install = <S, A extends Action>(
+export const prepare = <S, A extends Action>(
   providedRuntime?: Runtime<S, A>
 ): { runtime: Runtime<S, A>; enhancer: StoreEnhancer<S> } => {
   const runtime: Runtime<S, A> = providedRuntime
@@ -19,10 +19,10 @@ export const install = <S, A extends Action>(
     runtime,
     enhancer: (next: StoreEnhancerStoreCreator<S>) => (
       reducer: Reducer<S>,
-      preloadedState?: S | [S, CmdType<A>[]]
+      preloadedState?: S | [S, CmdType<A, any>[]]
     ): Store<S> => {
       let initialModel: S | undefined = undefined;
-      let initialCmds: CmdType<A>[] = [];
+      let initialCmds: CmdType<A, any>[] = [];
 
       if (preloadedState) {
         if (preloadedState['length'] === 2) {

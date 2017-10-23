@@ -1,191 +1,336 @@
 import { Cmd } from './cmd';
 
-async function effect1(name: string): Promise<string> {
-  return await Promise.resolve(name);
+function doEffect(name: string): Promise<string> {
+  return Promise.resolve(name);
 }
 
-function onSuccess(name: string) {
-  return { type: 'SUCCESS', name };
+function doEffectFail(name: string): Promise<string> {
+  return Promise.reject(new Error(`Failed - ${name}`));
 }
 
-function onFail(name: string) {
-  return { type: 'FAIL', name };
+function doEffectThrow(name: string): Promise<string> {
+  throw new Error(`Failed - ${name}`);
 }
 
-test('Cmd.run', () => {
-  expect(
-    Cmd.run(Cmd.fn(effect1, 'hello world'), {
-      success: Cmd.fn(onSuccess),
-      fail: Cmd.fn(onFail),
-    })
-  ).toEqual({
-    type: 'RUN',
-    effect: {
-      name: 'effect1',
-      func: effect1,
-      args: ['hello world'],
-    },
-    success: {
-      name: 'onSuccess',
-      func: onSuccess,
-      args: [],
-    },
-    fail: {
-      name: 'onFail',
-      func: onFail,
-      args: [],
-    },
-  });
-});
+function onSuccess(name: string, extra: string): SubAction {
+  return { type: 'SUCCESS', name, extra };
+}
 
-test('Cmd.action', () => {
-  expect(Cmd.action({ type: 'HELLO' })).toEqual({
-    type: 'ACTION',
-    name: 'HELLO',
-    actionToDispatch: {
-      type: 'HELLO',
-    },
-  });
-});
+function onFail(error: Error, extra: string): SubAction {
+  return { type: 'FAIL', errorMessage: error.message, extra };
+}
 
-type SubAction = { type: 'INNER'; name: string };
+type SubAction = SuccessAction | FailAction;
 
-type OuterAction = { type: 'OUTER'; subAction: SubAction };
+type SuccessAction = {
+  type: 'SUCCESS';
+  name: string;
+  extra: string;
+};
 
-function taggerFunc(subAction: SubAction): OuterAction {
+type FailAction = {
+  type: 'FAIL';
+  errorMessage: string;
+  extra: string;
+};
+
+type OuterAction = { type: 'OUTER'; subAction: SubAction; taggerExtra: string };
+
+function taggerFunc(subAction: SubAction, taggerExtra: string): OuterAction {
   return {
     type: 'OUTER',
     subAction,
+    taggerExtra,
   };
 }
 
-function onSubActionSuccess(name: string): SubAction {
-  return { type: 'INNER', name };
-}
-
-test('Cmd.tag', () => {
-  expect(Cmd.tag(taggerFunc, Cmd.action({ type: 'INNER' }))).toEqual({
-    type: 'TAG',
-    name: 'taggerFunc',
-    tagger: taggerFunc,
-    nestedCmd: {
-      type: 'ACTION',
-      name: 'INNER',
-      actionToDispatch: {
-        type: 'INNER',
+describe('Cmd.run', () => {
+  test('without options', () => {
+    const cmd = Cmd.run(Cmd.effect(doEffect, 'hello world'));
+    expect(cmd).toEqual({
+      type: 'RUN',
+      name: 'doEffect',
+      effect: {
+        name: 'doEffect',
+        func: doEffect,
+        args: ['hello world'],
       },
-    },
+    });
   });
 
-  expect(
-    Cmd.tag(
-      taggerFunc,
-      Cmd.run(Cmd.fn(effect1, 'hello world'), {
-        success: Cmd.fn(onSubActionSuccess),
-        fail: Cmd.fn(onSubActionSuccess),
+  test('with options', () => {
+    expect(
+      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+        fail: Cmd.actionCreator(onFail, 'extra'),
       })
-    )
-  ).toEqual({
-    type: 'TAG',
-    name: 'taggerFunc',
-    tagger: taggerFunc,
-    nestedCmd: {
+    ).toEqual({
       type: 'RUN',
+      name: 'doEffect',
       effect: {
-        name: 'effect1',
-        func: effect1,
+        name: 'doEffect',
+        func: doEffect,
         args: ['hello world'],
       },
       success: {
-        name: 'onSubActionSuccess',
-        func: onSubActionSuccess,
-        args: [],
+        name: 'onSuccess',
+        func: onSuccess,
+        args: ['extra'],
       },
       fail: {
-        name: 'onSubActionSuccess',
-        func: onSubActionSuccess,
-        args: [],
+        name: 'onFail',
+        func: onFail,
+        args: ['extra'],
       },
-    },
+    });
   });
 });
 
-test('Cmd.map', () => {
-  expect(Cmd.map(taggerFunc, [Cmd.action({ type: 'INNER' })])).toEqual([
-    {
-      type: 'TAG',
-      name: 'taggerFunc',
-      tagger: taggerFunc,
-      nestedCmd: {
-        type: 'ACTION',
-        name: 'INNER',
-        actionToDispatch: {
+describe('Cmd.action', () => {
+  test('works', () => {
+    expect(Cmd.action({ type: 'HELLO' })).toEqual({
+      type: 'ACTION',
+      name: 'HELLO',
+      actionToDispatch: {
+        type: 'HELLO',
+      },
+    });
+  });
+});
+
+describe('Cmd.tag', () => {
+  test('over action', () => {
+    expect(
+      Cmd.tag(taggerFunc, Cmd.action({ type: 'INNER' }), 'extra')
+    ).toEqual({
+      type: 'ACTION',
+      name: 'taggerFunc -> INNER',
+      actionToDispatch: {
+        type: 'OUTER',
+        subAction: {
           type: 'INNER',
         },
+        taggerExtra: 'extra',
       },
-    },
-  ]);
+    });
+  });
 
-  expect(
-    Cmd.map(taggerFunc, [
-      Cmd.run(Cmd.fn(effect1, 'hello world'), {
-        success: Cmd.fn(onSubActionSuccess),
-        fail: Cmd.fn(onSubActionSuccess),
-      }),
-    ])
-  ).toEqual([
-    {
-      type: 'TAG',
-      name: 'taggerFunc',
-      tagger: taggerFunc,
-      nestedCmd: {
+  test('over run', () => {
+    expect(
+      Cmd.tag(
+        taggerFunc,
+        Cmd.run(Cmd.effect(doEffect, 'hello world'), {
+          success: Cmd.actionCreator(onSuccess, 'extra'),
+          fail: Cmd.actionCreator(onFail, 'extra'),
+        }),
+        'tagExtra'
+      )
+    ).toEqual({
+      type: 'RUN',
+      name: 'taggerFunc -> doEffect',
+      effect: {
+        name: 'doEffect',
+        func: doEffect,
+        args: ['hello world'],
+      },
+      success: {
+        name: 'taggerFunc',
+        func: taggerFunc,
+        args: ['tagExtra'],
+        nested: {
+          name: 'onSuccess',
+          func: onSuccess,
+          args: ['extra'],
+        },
+      },
+      fail: {
+        name: 'taggerFunc',
+        func: taggerFunc,
+        args: ['tagExtra'],
+        nested: {
+          name: 'onFail',
+          func: onFail,
+          args: ['extra'],
+        },
+      },
+    });
+  });
+});
+
+describe('Cmd.map', () => {
+  test('over action', () => {
+    expect(
+      Cmd.map(taggerFunc, [Cmd.action({ type: 'INNER' })], 'tagExtra')
+    ).toEqual([
+      {
+        type: 'ACTION',
+        name: 'taggerFunc -> INNER',
+        actionToDispatch: {
+          type: 'OUTER',
+          taggerExtra: 'tagExtra',
+          subAction: {
+            type: 'INNER',
+          },
+        },
+      },
+    ]);
+  });
+
+  test('over run', () => {
+    expect(
+      Cmd.map(
+        taggerFunc,
+        [
+          Cmd.run(Cmd.effect(doEffect, 'hello world'), {
+            success: Cmd.actionCreator(onSuccess, 'extra'),
+            fail: Cmd.actionCreator(onFail, 'extra'),
+          }),
+        ],
+        'tagExtra'
+      )
+    ).toEqual([
+      {
         type: 'RUN',
+        name: 'taggerFunc -> doEffect',
         effect: {
-          name: 'effect1',
-          func: effect1,
+          name: 'doEffect',
+          func: doEffect,
           args: ['hello world'],
         },
         success: {
-          name: 'onSubActionSuccess',
-          func: onSubActionSuccess,
-          args: [],
+          name: 'taggerFunc',
+          func: taggerFunc,
+          args: ['tagExtra'],
+          nested: {
+            name: 'onSuccess',
+            func: onSuccess,
+            args: ['extra'],
+          },
         },
         fail: {
-          name: 'onSubActionSuccess',
-          func: onSubActionSuccess,
-          args: [],
+          name: 'taggerFunc',
+          func: taggerFunc,
+          args: ['tagExtra'],
+          nested: {
+            name: 'onFail',
+            func: onFail,
+            args: ['extra'],
+          },
         },
       },
-    },
-  ]);
+    ]);
+  });
 });
 
-function onEffect1Success(name: string) {
-  return { type: 'SUCCESS', name };
-}
+describe('Cmd.execute', () => {
+  test('action', async () => {
+    const action = await Cmd.execute(Cmd.action({ type: 'SOMETHING' }));
 
-test('Cmd.execute', async () => {
-  expect.assertions(2);
+    expect(action).toEqual({ type: 'SOMETHING' });
+  });
 
-  const data = await Cmd.execute(
-    Cmd.run(Cmd.fn(effect1, 'hello world'), {
-      success: Cmd.fn(onEffect1Success),
-    })
-  );
-  expect(data).toEqual({ type: 'SUCCESS', name: 'hello world' });
+  test('run succeeds without action creators', async () => {
+    const data = await Cmd.execute(
+      Cmd.run(Cmd.effect(doEffect, 'hello world'))
+    );
 
-  const taggedCmd = Cmd.tag(
-    taggerFunc,
-    Cmd.run(Cmd.fn(effect1, 'hello world'), {
-      success: Cmd.fn(onSubActionSuccess),
-    })
-  );
-  const taggedData = await Cmd.execute(taggedCmd);
-  expect(taggedData).toEqual({
-    type: 'OUTER',
-    subAction: {
-      type: 'INNER',
+    expect(data).toEqual(undefined);
+  });
+
+  test('run succeeds with success/fail action creators', async () => {
+    const data = await Cmd.execute(
+      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+        fail: Cmd.actionCreator(onFail, 'extra'),
+      })
+    );
+
+    expect(data).toEqual({
+      type: 'SUCCESS',
       name: 'hello world',
-    },
+      extra: 'extra',
+    });
+  });
+
+  test('run fails with success/fail action creators', async () => {
+    const data = await Cmd.execute(
+      Cmd.run(Cmd.effect(doEffectFail, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+        fail: Cmd.actionCreator(onFail, 'extra'),
+      })
+    );
+
+    expect(data).toEqual({
+      type: 'FAIL',
+      errorMessage: 'Failed - hello world',
+      extra: 'extra',
+    });
+  });
+
+  test('run throws with success/fail action creators', async () => {
+    const data = await Cmd.execute(
+      Cmd.run(Cmd.effect(doEffectThrow, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+        fail: Cmd.actionCreator(onFail, 'extra'),
+      })
+    );
+
+    expect(data).toEqual({
+      type: 'FAIL',
+      errorMessage: 'Failed - hello world',
+      extra: 'extra',
+    });
+  });
+
+  test('run fails without success/fail action creators', () => {
+    expect.assertions(1);
+    Cmd.execute(Cmd.run(Cmd.effect(doEffectFail, 'hello world'))).then(result =>
+      expect(result).toBe(undefined)
+    );
+  });
+
+  test('tagged run succeeds with success/fail action creators', async () => {
+    const taggedCmd = Cmd.tag(
+      taggerFunc,
+      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+      }),
+      'tagExtra'
+    );
+
+    const taggedData = await Cmd.execute(taggedCmd);
+
+    expect(taggedData).toEqual({
+      type: 'OUTER',
+      taggerExtra: 'tagExtra',
+      subAction: {
+        type: 'SUCCESS',
+        name: 'hello world',
+        extra: 'extra',
+      },
+    });
+  });
+
+  test('tagged run fails with success/fail action creators', async () => {
+    const taggedCmdFail = Cmd.tag(
+      taggerFunc,
+      Cmd.run(Cmd.effect(doEffectFail, 'hello world'), {
+        success: Cmd.actionCreator(onSuccess, 'extra'),
+        fail: Cmd.actionCreator(onFail, 'extra'),
+      }),
+      'tagExtra'
+    );
+
+    const taggedFailData = await Cmd.execute(taggedCmdFail);
+
+    expect(taggedFailData).toEqual({
+      type: 'OUTER',
+      taggerExtra: 'tagExtra',
+      subAction: {
+        type: 'FAIL',
+        errorMessage: 'Failed - hello world',
+        extra: 'extra',
+      },
+    });
   });
 });

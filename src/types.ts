@@ -1,42 +1,39 @@
-import { Action, AnyAction } from 'redux';
+import { Action } from 'redux';
 
 export interface TeaReducer<S, A extends Action> {
-  (state: S | undefined, action: A, dispatch: Dispatch<A>): [S, CmdType<A>[]];
+  (state: S | undefined, action: A, dispatch: Dispatch<A>): [
+    S,
+    CmdType<A, any>[]
+  ];
 }
 
-export type CmdType<A extends Action> =
-  | ActionCmd<A>
-  | RunCmd<A>
-  | TagCmd<A, AnyAction>;
+export type ActionCreator<A, R> = {
+  name: string;
+  func: (result: R, ...args: any[]) => A;
+  args: any[];
+  nested?: ActionCreator<R, any>;
+};
 
-export type AppliedCmdType<A extends Action> = ActionCmd<A> | RunCmd<A>;
+export type Effect<R> = {
+  name: string;
+  func: (...args: any[]) => Promise<R>;
+  args: any[];
+};
 
-export interface ActionCmd<A extends Action> {
+export type CmdType<A extends Action, R> = ActionCmd<A> | RunCmd<A, R>;
+
+export type ActionCmd<A extends Action> = {
   type: 'ACTION';
   actionToDispatch: A;
   name: string;
-}
+};
 
-export type Tagger<B extends Action, A extends Action> = (subAction: B) => A;
-
-export interface TagCmd<A extends Action, B extends Action> {
-  type: 'TAG';
-  tagger: Tagger<B, A>;
-  nestedCmd: CmdType<B>;
-  name: string;
-}
-
-export interface RunCmd<A extends Action> {
+export type RunCmd<A extends Action, R> = {
   type: 'RUN';
-  effect: Callable<any>;
-  fail?: Callable<A>;
-  success?: Callable<A>;
-}
+  name: string;
+  effect: Effect<R>;
+  fail?: ActionCreator<A, any>;
+  success?: ActionCreator<A, R>;
+};
 
 export type Dispatch<A> = (action: A) => void;
-
-export type Callable<R> = {
-  name: string;
-  func: (...args: any[]) => R;
-  args: any[];
-};

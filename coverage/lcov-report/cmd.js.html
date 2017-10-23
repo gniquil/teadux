@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for cmd.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="index.html">All files</a> cmd.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.63% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>58/64</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">81.82% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>18/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.75% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>15/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">88.64% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>39/44</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
+var __assign = (this &amp;&amp; this.__assign) || Object.assign || <span class="fstat-no" title="function not covered" ><span class="branch-3 cbranch-no" title="branch not covered" >fu</span>nction(t) {</span>
+<span class="cstat-no" title="statement not covered" >    for (var s, i = 1, n = arguments.length; i &lt; n; i++) {</span>
+<span class="cstat-no" title="statement not covered" >        s = arguments[i];</span>
+<span class="cstat-no" title="statement not covered" >        for (var p in s) <span class="cstat-no" title="statement not covered" >if (Object.prototype.hasOwnProperty.call(s, p))</span></span>
+<span class="cstat-no" title="statement not covered" >            t[p] = s[p];</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return t;</span>
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+function run(effect, options) {
+    if (options === void 0) { options = {}; }
+    return __assign({ type: 'RUN', name: effect.name, effect: effect }, options);
+}
+function action(actionToDispatch) {
+    return {
+        type: 'ACTION',
+        name: actionToDispatch.type,
+        actionToDispatch: actionToDispatch,
+    };
+}
+function tag() {
+    var _a = Array.prototype.slice.call(arguments), tagger = _a[0], nestedCmd = _a[1], args = _a.slice(2);
+    if (nestedCmd.type === 'ACTION') {
+        var _b = nestedCmd;
+        return __assign({}, nestedCmd, { name: tagger.name + " -&gt; " + nestedCmd.name, actionToDispatch: tagger.apply(void 0, [nestedCmd.actionToDispatch].concat(args)) });
+    }
+    else {
+        var success = nestedCmd.success, fail_1 = nestedCmd.fail;
+        return __assign({}, nestedCmd, { name: tagger.name + " -&gt; " + nestedCmd.name, success: success
+                ? {
+                    name: tagger.name,
+                    func: tagger,
+                    args: args,
+                    nested: success,
+                }
+                : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span> fail: fail_1
+                ? {
+                    name: tagger.name,
+                    func: tagger,
+                    args: args,
+                    nested: fail_1,
+                }
+                : undefined });
+    }
+}
+function map() {
+    var _a = Array.prototype.slice.call(arguments), tagger = _a[0], nestedCmds = _a[1], args = _a.slice(2);
+    return nestedCmds.map(function (cmd) { return tag.apply(void 0, [tagger, cmd].concat(args)); });
+}
+function execute(cmd) {
+    switch (cmd.type) {
+        case 'RUN': {
+            var success_1 = cmd.success
+                ? cmd.success
+                : actionCreator(function () {
+                    var args = [];
+                    for (var _i = 0; _i &lt; arguments.length; _i++) {
+                        args[_i] = arguments[_i];
+                    }
+                });
+            var fail_2 = cmd.fail ? cmd.fail : actionCreator(function () {
+                var args = [];
+                for (var _i = 0; _i &lt; arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+            });
+            try {
+                return applyEffect(cmd.effect).then(function (result) { return applyActionCreator(success_1, result); }, function (error) { return applyActionCreator(fail_2, error); });
+            }
+            catch (error) {
+                return Promise.reject(error).then(null, function (error) {
+                    return applyActionCreator(fail_2, error);
+                });
+            }
+        }
+        case 'ACTION': {
+            return Promise.resolve(cmd.actionToDispatch);
+        }
+    }
+}
+function applyEffect(_a) {
+    var args = _a.args, func = _a.func;
+    return func.apply(void 0, args);
+}
+function applyActionCreator(actionCreator, arg) {
+    if (actionCreator.nested) {
+        var args = actionCreator.args, func = actionCreator.func, nested = actionCreator.nested;
+        return func.apply(void 0, [applyActionCreator(nested, arg)].concat(args));
+    }
+    else {
+        var args = actionCreator.args, func = actionCreator.func;
+        return func.apply(void 0, [arg].concat(args));
+    }
+}
+function effect() {
+    var _a = Array.prototype.slice.call(arguments), func = _a[0], args = _a.slice(1);
+    return {
+        name: func.name,
+        func: func,
+        args: args,
+    };
+}
+function actionCreator() {
+    var _a = Array.prototype.slice.call(arguments), func = _a[0], args = _a.slice(1);
+    return {
+        name: func.name,
+        func: func,
+        args: args,
+    };
+}
+exports.Cmd = {
+    action: action,
+    run: run,
+    tag: tag,
+    map: map,
+    execute: execute,
+    applyEffect: applyEffect,
+    applyActionCreator: applyActionCreator,
+    effect: effect,
+    actionCreator: actionCreator,
+};
+//# sourceMappingURL=cmd.js.map</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Oct 22 2017 23:25:18 GMT-0400 (EDT)
+</div>
+</div>
+<script src="prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="sorter.js"></script>
+</body>
+</html>

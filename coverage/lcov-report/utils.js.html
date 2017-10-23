@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for utils.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="index.html">All files</a> utils.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.3% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>36/37</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">70.59% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>12/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/1</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.77% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>30/31</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var redux_1 = require("redux");
+function wrap() {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (exports._wrapCache.count &gt; exports._wrapCache.warningThreshold) {
+<span class="cstat-no" title="statement not covered" >        console &amp;&amp;</span>
+            console.warn &amp;&amp;
+            console.warn("cached item count is now at " + exports._wrapCache.count);
+    }
+    var funcs = Array.prototype.slice.call(arguments);
+    if (funcs.length === 1) {
+        return funcs[0];
+    }
+    else if (funcs.length === 2) {
+        var func1 = funcs[0], func2 = funcs[1];
+        var func1Cache = exports._wrapCache.cache.get(func1);
+        if (!func1Cache) {
+            func1Cache = new Map();
+            exports._wrapCache.count = exports._wrapCache.count + 1;
+            exports._wrapCache.cache.set(func1, func1Cache);
+        }
+        var func12 = func1Cache.get(func2);
+        if (!func12) {
+            func12 = redux_1.compose(func1, func2);
+            exports._wrapCache.count = exports._wrapCache.count + 1;
+            func1Cache.set(func2, func12);
+        }
+        return func12;
+    }
+    else if (funcs.length === 3) {
+        /* can't get the following to type check... but this is embarrassing
+          ```
+          const [func1, ...rest] = funcs;
+          const funcRest = wrap(...rest);
+          return wrap(func1, funcRest);
+          ```
+        */
+        var func1 = funcs[0], func2 = funcs[1], func3 = funcs[2];
+        var func23 = wrap(func2, func3);
+        return wrap(func1, func23);
+    }
+    else <span class="missing-if-branch" title="else path not taken" >E</span>if (funcs.length === 4) {
+        var func1 = funcs[0], func2 = funcs[1], func3 = funcs[2], func4 = funcs[3];
+        var func34 = wrap(func3, func4);
+        var func234 = wrap(func2, func34);
+        return wrap(func1, func234);
+    }
+}
+exports.wrap = wrap;
+exports._wrapCache = {
+    cache: new Map(),
+    count: 0,
+    warningThreshold: 300,
+};
+//# sourceMappingURL=utils.js.map</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Oct 22 2017 23:25:18 GMT-0400 (EDT)
+</div>
+</div>
+<script src="prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="sorter.js"></script>
+</body>
+</html>

@@ -1,23 +1,24 @@
 import { Action } from 'redux';
-import { CmdType, RunCmd, Tagger, Callable, AppliedCmdType } from './types';
+import { CmdType, ActionCreator, Effect } from './types';
 
-type RunOptions<A extends Action> = {
-  fail?: Callable<A>;
-  success?: Callable<A>;
+type RunOptions<A extends Action, R> = {
+  fail?: ActionCreator<A, any>;
+  success?: ActionCreator<A, R>;
 };
 
-function run<A extends Action>(
-  effect: Callable<Promise<any>>,
-  options: RunOptions<A> = {}
-): CmdType<A> {
+function run<A extends Action, R>(
+  effect: Effect<R>,
+  options: RunOptions<A, R> = {}
+): CmdType<A, R> {
   return {
     type: 'RUN',
+    name: effect.name,
     effect,
     ...options,
   };
 }
 
-function action<A extends Action>(actionToDispatch: A): CmdType<A> {
+function action<A extends Action>(actionToDispatch: A): CmdType<A, any> {
   return {
     type: 'ACTION',
     name: actionToDispatch.type,
@@ -26,204 +27,218 @@ function action<A extends Action>(actionToDispatch: A): CmdType<A> {
 }
 
 function tag<A extends Action, B extends Action>(
-  tagger: Tagger<B, A>,
-  nestedCmd: CmdType<B>,
-  name?: string
-): CmdType<A> {
-  return {
-    type: 'TAG',
-    name: name ? name : tagger.name,
-    tagger,
-    nestedCmd,
-  };
+  tagger: (subAction: B) => A,
+  nestedCmd: CmdType<B, any>
+): CmdType<A, any>;
+function tag<A extends Action, B extends Action, A1>(
+  tagger: (subAction: B, a1: A1) => A,
+  nestedCmd: CmdType<B, any>,
+  a1: A1
+): CmdType<A, any>;
+function tag<A extends Action, B extends Action, A1, A2>(
+  tagger: (subAction: B, a1: A1, a2: A2) => A,
+  nestedCmd: CmdType<B, any>,
+  a1: A1,
+  a2: A2
+): CmdType<A, any>;
+function tag<A extends Action, B extends Action, A1, A2, A3>(
+  tagger: (subAction: B, a1: A1, a2: A2, a3: A3) => A,
+  nestedCmd: CmdType<B, any>,
+  a1: A1,
+  a2: A2,
+  a3: A3
+): CmdType<A, any>;
+function tag<A extends Action, B extends Action, A1, A2, A3, A4>(
+  tagger: (subAction: B, a1: A1, a2: A2, a3: A3, a4: A4) => A,
+  nestedCmd: CmdType<B, any>,
+  a1: A1,
+  a2: A2,
+  a3: A3,
+  a4: A4
+): CmdType<A, any>;
+function tag() {
+  const [tagger, nestedCmd, ...args] = Array.prototype.slice.call(arguments);
+
+  if (nestedCmd.type === 'ACTION') {
+    const {} = nestedCmd;
+    return {
+      ...nestedCmd,
+      name: `${tagger.name} -> ${nestedCmd.name}`,
+      actionToDispatch: tagger(nestedCmd.actionToDispatch, ...args),
+    };
+  } else {
+    const { success, fail } = nestedCmd;
+    return {
+      ...nestedCmd,
+      name: `${tagger.name} -> ${nestedCmd.name}`,
+      success: success
+        ? {
+            name: tagger.name,
+            func: tagger,
+            args,
+            nested: success,
+          }
+        : undefined,
+      fail: fail
+        ? {
+            name: tagger.name,
+            func: tagger,
+            args,
+            nested: fail,
+          }
+        : undefined,
+    };
+  }
 }
 
 function map<A extends Action, B extends Action>(
-  tagger: Tagger<B, A>,
-  nestedCmds: CmdType<B>[],
-  name?: string
-): CmdType<A>[] {
-  return nestedCmds.map(cmd => tag(tagger, cmd, name));
+  tagger: (subAction: B) => A,
+  nestedCmds: CmdType<B, any>[]
+): CmdType<A, any>[];
+function map<A extends Action, B extends Action, A1>(
+  tagger: (subAction: B, a1: A1) => A,
+  nestedCmds: CmdType<B, any>[],
+  a1: A1
+): CmdType<A, any>[];
+function map<A extends Action, B extends Action, A1, A2>(
+  tagger: (subAction: B, a1: A1, a2: A2) => A,
+  nestedCmds: CmdType<B, any>[],
+  a1: A1,
+  a2: A2
+): CmdType<A, any>[];
+function map<A extends Action, B extends Action, A1, A2, A3>(
+  tagger: (subAction: B, a1: A1, a2: A2, a3: A3) => A,
+  nestedCmds: CmdType<B, any>[],
+  a1: A1,
+  a2: A2,
+  a3: A3
+): CmdType<A, any>[];
+function map<A extends Action, B extends Action, A1, A2, A3, A4>(
+  tagger: (subAction: B, a1: A1, a2: A2, a3: A3, a4: A4) => A,
+  nestedCmds: CmdType<B, any>[],
+  a1: A1,
+  a2: A2,
+  a3: A3,
+  a4: A4
+): CmdType<A, any>[];
+function map() {
+  const [tagger, nestedCmds, ...args] = Array.prototype.slice.call(arguments);
+
+  return nestedCmds.map((cmd: any) => tag(tagger, cmd, ...args));
 }
 
-function executeRun<A extends Action>(
-  cmd: RunCmd<A>
+function execute<A extends Action>(
+  cmd: CmdType<A, any>
 ): Promise<A | null | void> {
-  const success = cmd.success ? cmd.success : fn((...args: any[]) => {});
-  const fail = cmd.fail ? cmd.fail : fn((...args: any[]) => {});
-  try {
-    return Promise.resolve(apply(cmd.effect)).then(
-      result =>
-        result !== undefined ? apply(success, result) : apply(success),
-      error => (error !== undefined ? apply(fail, error) : apply(fail))
-    );
-  } catch (error) {
-    return Promise.resolve(error).then(null, error => {
-      return apply(fail, error);
-    });
-  }
-}
-
-function applyMap<A extends Action, B extends Action>(
-  cmd: CmdType<B>,
-  tagger: Tagger<B, A>,
-  name?: string
-): AppliedCmdType<A> {
-  switch (cmd.type) {
-    case 'ACTION': {
-      const taggedAction = tagger(cmd.actionToDispatch);
-      return {
-        ...cmd,
-        actionToDispatch: taggedAction,
-        name: `${name ? name : tagger.name} -> ${cmd.name}`,
-      };
-    }
-    case 'RUN': {
-      const { success, fail } = cmd;
-      const taggedSuccess = success
-        ? {
-            ...success,
-            func: (...args: any[]) => tagger(apply(success, ...args)),
-            name: `${name ? name : tagger.name} -> ${success.name}`,
-          }
-        : undefined;
-
-      const taggedFail = fail
-        ? {
-            ...fail,
-            func: (...args: any[]) => tagger(apply(fail, ...args)),
-            name: `${name ? name : tagger.name} -> ${fail.name}`,
-          }
-        : undefined;
-
-      return {
-        ...cmd,
-        success: taggedSuccess,
-        fail: taggedFail,
-      };
-    }
-    case 'TAG': {
-      const appliedNestedCmd = applyMap(cmd.nestedCmd, cmd.tagger, cmd.name);
-      return applyMap(appliedNestedCmd, tagger, name);
-    }
-  }
-}
-
-function execute<A extends Action>(cmd: CmdType<A>): Promise<A | null | void> {
   switch (cmd.type) {
     case 'RUN': {
-      return executeRun(cmd);
+      const success = cmd.success
+        ? cmd.success
+        : actionCreator((...args: any[]) => {});
+      const fail = cmd.fail ? cmd.fail : actionCreator((...args: any[]) => {});
+      try {
+        return applyEffect(cmd.effect).then(
+          result => applyActionCreator(success, result),
+          error => applyActionCreator(fail, error)
+        );
+      } catch (error) {
+        return Promise.reject(error).then(null, error => {
+          return applyActionCreator(fail, error);
+        });
+      }
     }
     case 'ACTION': {
       return Promise.resolve(cmd.actionToDispatch);
     }
-    case 'TAG': {
-      const applied = applyMap(cmd.nestedCmd, cmd.tagger, cmd.name);
-      if (applied.type === 'ACTION') {
-        return Promise.resolve(applied.actionToDispatch);
-      } else {
-        return executeRun(applied);
-      }
-    }
   }
 }
 
-function apply<R>(callable: Callable<R>, ...extraArgs: any[]): R {
-  const { args, func } = callable;
-  return func(...args, ...extraArgs);
+function applyEffect<R>({ args, func }: Effect<R>): Promise<R> {
+  return func(...args);
 }
 
-// zero final
-function fn<R>(func: () => R): Callable<R>;
-function fn<A1, R>(func: (a1: A1) => R, arg: A1): Callable<R>;
-function fn<A1, A2, R>(
-  func: (a1: A1, a2: A2) => R,
+function applyActionCreator<R, A>(
+  actionCreator: ActionCreator<R, A>,
+  arg: A
+): R {
+  if (actionCreator.nested) {
+    const { args, func, nested } = actionCreator;
+    return func(applyActionCreator(nested, arg), ...args);
+  } else {
+    const { args, func } = actionCreator;
+    return func(arg, ...args);
+  }
+}
+
+function effect<R>(func: () => Promise<R>): Effect<R>;
+function effect<A1, R>(func: (a1: A1) => Promise<R>, arg: A1): Effect<R>;
+function effect<A1, A2, R>(
+  func: (a1: A1, a2: A2) => Promise<R>,
   arg1: A1,
   arg2: A2
-): Callable<R>;
-function fn<A1, A2, A3, R>(
-  func: (a1: A1, a2: A2, a3: A3) => R,
+): Effect<R>;
+function effect<A1, A2, A3, R>(
+  func: (a1: A1, a2: A2, a3: A3) => Promise<R>,
   arg1: A1,
   arg2: A2,
   arg3: A3
-): Callable<R>;
-function fn<A1, A2, A3, A4, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4) => R,
+): Effect<R>;
+function effect<A1, A2, A3, A4, R>(
+  func: (a1: A1, a2: A2, a3: A3, a4: A4) => Promise<R>,
   arg1: A1,
   arg2: A2,
   arg3: A3,
   arg4: A4
-): Callable<R>;
-function fn<A1, A2, A3, A4, A5, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R,
+): Effect<R>;
+function effect<A1, A2, A3, A4, A5, R>(
+  func: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => Promise<R>,
   arg1: A1,
   arg2: A2,
   arg3: A3,
   arg4: A4,
   arg5: A5
-): Callable<R>;
-// one final applied arg e.g. Action Creators
-function fn<B1, R>(func: (b1: B1) => R): Callable<R>;
-function fn<B1, A1, R>(func: (a1: A1, b1: B1) => R, arg: A1): Callable<R>;
-function fn<B1, A1, A2, R>(
-  func: (a1: A1, a2: A2, b1: B1) => R,
-  arg1: A1,
-  arg2: A2
-): Callable<R>;
-function fn<B1, A1, A2, A3, R>(
-  func: (a1: A1, a2: A2, a3: A3, b1: B1) => R,
-  arg1: A1,
-  arg2: A2,
-  arg3: A3
-): Callable<R>;
-function fn<B1, A1, A2, A3, A4, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4, b1: B1) => R,
-  arg1: A1,
-  arg2: A2,
-  arg3: A3,
-  arg4: A4
-): Callable<R>;
-function fn<B1, A1, A2, A3, A4, A5, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, b1: B1) => R,
-  arg1: A1,
-  arg2: A2,
-  arg3: A3,
-  arg4: A4,
-  arg5: A5
-): Callable<R>;
-// two final applied args
-function fn<B1, B2, R>(func: (b1: B1, b2: B2) => R): Callable<R>;
-function fn<B1, B2, A1, R>(
-  func: (a1: A1, b1: B1, b2: B2) => R,
+): Effect<R>;
+function effect() {
+  const [func, ...args] = Array.prototype.slice.call(arguments);
+  return {
+    name: func.name,
+    func,
+    args,
+  };
+}
+
+function actionCreator<R, A>(func: (result: R) => A): ActionCreator<A, R>;
+function actionCreator<R, A1, A>(
+  func: (result: R, a1: A1) => A,
   arg: A1
-): Callable<R>;
-function fn<B1, B2, A1, A2, R>(
-  func: (a1: A1, a2: A2, b1: B1, b2: B2) => R,
+): ActionCreator<A, R>;
+function actionCreator<R, A1, A2, A>(
+  func: (result: R, a1: A1, a2: A2) => A,
   arg1: A1,
   arg2: A2
-): Callable<R>;
-function fn<B1, B2, A1, A2, A3, R>(
-  func: (a1: A1, a2: A2, a3: A3, b1: B1, b2: B2) => R,
+): ActionCreator<A, R>;
+function actionCreator<R, A1, A2, A3, A>(
+  func: (result: R, a1: A1, a2: A2, a3: A3) => A,
   arg1: A1,
   arg2: A2,
   arg3: A3
-): Callable<R>;
-function fn<B1, B2, A1, A2, A3, A4, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4, b1: B1, b2: B2) => R,
+): ActionCreator<A, R>;
+function actionCreator<R, A1, A2, A3, A4, A>(
+  func: (result: R, a1: A1, a2: A2, a3: A3, a4: A4) => A,
   arg1: A1,
   arg2: A2,
   arg3: A3,
   arg4: A4
-): Callable<R>;
-function fn<B1, B2, A1, A2, A3, A4, A5, R>(
-  func: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, b1: B1, b2: B2) => R,
+): ActionCreator<A, R>;
+function actionCreator<R, A1, A2, A3, A4, A5, A>(
+  func: (result: R, a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => A,
   arg1: A1,
   arg2: A2,
   arg3: A3,
   arg4: A4,
   arg5: A5
-): Callable<R>;
-function fn() {
+): ActionCreator<A, R>;
+function actionCreator() {
   const [func, ...args] = Array.prototype.slice.call(arguments);
   return {
     name: func.name,
@@ -234,12 +249,12 @@ function fn() {
 
 export const Cmd = {
   action,
-  tag,
   run,
+  tag,
   map,
-  executeRun,
-  applyMap,
-  apply,
   execute,
-  fn,
+  applyEffect,
+  applyActionCreator,
+  effect,
+  actionCreator,
 };

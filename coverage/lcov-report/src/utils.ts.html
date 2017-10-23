@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/utils.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">All files</a> / <a href="index.html">src</a> utils.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.22% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>35/36</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">70.59% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>12/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/1</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.67% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>29/30</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129</td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { compose } from 'redux';
+&nbsp;
+export type Func0&lt;R&gt; = () =&gt; R;
+export type Func1&lt;T1, R&gt; = (a1: T1) =&gt; R;
+export type Func2&lt;T1, T2, R&gt; = (a1: T1, a2: T2) =&gt; R;
+export type Func3&lt;T1, T2, T3, R&gt; = (
+  a1: T1,
+  a2: T2,
+  a3: T3,
+  ...args: any[]
+) =&gt; R;
+&nbsp;
+/* one functions */
+export function wrap&lt;F extends Function&gt;(f: F): F;
+&nbsp;
+/* two functions */
+export function wrap&lt;A, R&gt;(f1: (b: A) =&gt; R, f2: Func0&lt;A&gt;): Func0&lt;R&gt;;
+export function wrap&lt;A, T1, R&gt;(f1: (b: A) =&gt; R, f2: Func1&lt;T1, A&gt;): Func1&lt;T1, R&gt;;
+export function wrap&lt;A, T1, T2, R&gt;(
+  f1: (b: A) =&gt; R,
+  f2: Func2&lt;T1, T2, A&gt;
+): Func2&lt;T1, T2, R&gt;;
+export function wrap&lt;A, T1, T2, T3, R&gt;(
+  f1: (b: A) =&gt; R,
+  f2: Func3&lt;T1, T2, T3, A&gt;
+): Func3&lt;T1, T2, T3, R&gt;;
+&nbsp;
+/* three functions */
+export function wrap&lt;A, B, R&gt;(
+  f1: (b: B) =&gt; R,
+  f2: (a: A) =&gt; B,
+  f3: Func0&lt;A&gt;
+): Func0&lt;R&gt;;
+export function wrap&lt;A, B, T1, R&gt;(
+  f1: (b: B) =&gt; R,
+  f2: (a: A) =&gt; B,
+  f3: Func1&lt;T1, A&gt;
+): Func1&lt;T1, R&gt;;
+export function wrap&lt;A, B, T1, T2, R&gt;(
+  f1: (b: B) =&gt; R,
+  f2: (a: A) =&gt; B,
+  f3: Func2&lt;T1, T2, A&gt;
+): Func2&lt;T1, T2, R&gt;;
+export function wrap&lt;A, B, T1, T2, T3, R&gt;(
+  f1: (b: B) =&gt; R,
+  f2: (a: A) =&gt; B,
+  f3: Func3&lt;T1, T2, T3, A&gt;
+): Func3&lt;T1, T2, T3, R&gt;;
+&nbsp;
+/* four functions */
+export function wrap&lt;A, B, C, R&gt;(
+  f1: (b: C) =&gt; R,
+  f2: (a: B) =&gt; C,
+  f3: (a: A) =&gt; B,
+  f4: Func0&lt;A&gt;
+): Func0&lt;R&gt;;
+export function wrap&lt;A, B, C, T1, R&gt;(
+  f1: (b: C) =&gt; R,
+  f2: (a: B) =&gt; C,
+  f3: (a: A) =&gt; B,
+  f4: Func1&lt;T1, A&gt;
+): Func1&lt;T1, R&gt;;
+export function wrap&lt;A, B, C, T1, T2, R&gt;(
+  f1: (b: C) =&gt; R,
+  f2: (a: B) =&gt; C,
+  f3: (a: A) =&gt; B,
+  f4: Func2&lt;T1, T2, A&gt;
+): Func2&lt;T1, T2, R&gt;;
+export function wrap&lt;A, B, C, T1, T2, T3, R&gt;(
+  f1: (b: C) =&gt; R,
+  f2: (a: B) =&gt; C,
+  f3: (a: A) =&gt; B,
+  f4: Func3&lt;T1, T2, T3, A&gt;
+): Func3&lt;T1, T2, T3, R&gt;;
+&nbsp;
+export function wrap() {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (_wrapCache.count &gt; _wrapCache.warningThreshold) {
+<span class="cstat-no" title="statement not covered" >    console &amp;&amp;</span>
+      console.warn &amp;&amp;
+      console.warn(`cached item count is now at ${_wrapCache.count}`);
+  }
+  const funcs: any[] = Array.prototype.slice.call(arguments);
+&nbsp;
+  if (funcs.length === 1) {
+    return funcs[0];
+  } else if (funcs.length === 2) {
+    const [func1, func2] = funcs;
+    let func1Cache = _wrapCache.cache.get(func1);
+    if (!func1Cache) {
+      func1Cache = new Map();
+      _wrapCache.count = _wrapCache.count + 1;
+      _wrapCache.cache.set(func1, func1Cache);
+    }
+    let func12 = func1Cache.get(func2);
+    if (!func12) {
+      func12 = compose(func1, func2);
+      _wrapCache.count = _wrapCache.count + 1;
+      func1Cache.set(func2, func12);
+    }
+    return func12;
+  } else if (funcs.length === 3) {
+    /* can't get the following to type check... but this is embarrassing
+      ```
+      const [func1, ...rest] = funcs;
+      const funcRest = wrap(...rest);
+      return wrap(func1, funcRest);
+      ```
+    */
+    const [func1, func2, func3] = funcs;
+    const func23 = wrap(func2, func3);
+    return wrap(func1, func23);
+  } else <span class="missing-if-branch" title="else path not taken" >E</span>if (funcs.length === 4) {
+    const [func1, func2, func3, func4] = funcs;
+    const func34 = wrap(func3, func4);
+    const func234 = wrap(func2, func34);
+    return wrap(func1, func234);
+  }
+}
+&nbsp;
+export const _wrapCache: {
+  cache: Map&lt;any, Map&lt;any, any&gt;&gt;;
+  count: number;
+  warningThreshold: number;
+} = {
+  cache: new Map(),
+  count: 0,
+  warningThreshold: 300,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Oct 23 2017 09:18:36 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

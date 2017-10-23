@@ -19,6 +19,7 @@
     "typescript": "^2.5.3"
   },
   "scripts": {
+    "start": "jest --watchAll --coverage",
     "test": "jest",
     "clean": "rm -rf dist",
     "build": "yarn run clean && tsc"
@@ -27,7 +28,8 @@
     "transform": {
       "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "mapCoverage": true,
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(tsx?)$",
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"]
   }
 }

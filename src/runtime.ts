@@ -5,7 +5,7 @@ import { CmdType, Dispatch } from './types';
 
 export type Item<A extends Action> = {
   originalAction?: A;
-  cmds: CmdType<A>[];
+  cmds: CmdType<A, any>[];
 };
 
 export type Queue<A extends Action> = Item<A>[];
@@ -19,7 +19,7 @@ export class Runtime<S, A extends Action> {
   liftReducer(reducer: any) {
     return (state: S, action: A) => {
       const result = reducer(state, action, this.dispatch);
-      const [model, cmds]: [S, CmdType<A>[]] =
+      const [model, cmds]: [S, CmdType<A, any>[]] =
         result['length'] === 2 ? result : [result, []];
 
       this.enqueue({ originalAction: action, cmds });
@@ -54,19 +54,7 @@ export class Runtime<S, A extends Action> {
   run({ originalAction, cmds }: Item<A>, init: boolean = false) {
     return Promise.all(
       cmds.map(cmd => {
-        return Cmd.execute(cmd)
-          .then(a => a && this.dispatch(a))
-          .catch(error => {
-            console.error(
-              promiseCaughtError(
-                init
-                  ? 'Init action'
-                  : originalAction ? originalAction.type : 'Unknown action',
-                error
-              )
-            );
-            throw error;
-          });
+        return Cmd.execute(cmd).then(a => a && this.dispatch(a));
       })
     );
   }
@@ -75,13 +63,4 @@ export class Runtime<S, A extends Action> {
     this.dispatch = dispatch;
     this.run(item, true);
   }
-}
-
-function promiseCaughtError(originalActionType: string, error: any) {
-  return `
-Exception thrown when running Cmds from action: ${originalActionType}.
-
-Thrown exception:
-${error}
-`;
 }

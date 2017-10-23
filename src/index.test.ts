@@ -1,4 +1,4 @@
-import { install, createStore, Cmd, CmdType } from './index';
+import { prepare, createStore, Cmd, CmdType } from './index';
 
 //#region sample setup
 
@@ -45,15 +45,15 @@ type CounterInfo = {
 function counterReducer(
   state: CounterState = initialCounterState,
   action: CounterAction
-): [CounterState, CmdType<CounterAction>[], CounterInfo | null] {
+): [CounterState, CmdType<CounterAction, any>[], CounterInfo | null] {
   switch (action.type) {
     case 'Increment': {
       const counter = state.counter + 1;
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.fn(doConvert, counter), {
-            success: Cmd.fn(update),
+          Cmd.run(Cmd.effect(doConvert, counter), {
+            success: Cmd.actionCreator(update),
           }),
         ],
         { current: counter },
@@ -64,8 +64,8 @@ function counterReducer(
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.fn(doConvert, counter), {
-            success: Cmd.fn(update),
+          Cmd.run(Cmd.effect(doConvert, counter), {
+            success: Cmd.actionCreator(update),
           }),
         ],
         { current: counter },
@@ -120,7 +120,7 @@ type Init = {
 function reducer(
   state: State = initialState,
   action: Action
-): [State, CmdType<Action>[]] {
+): [State, CmdType<Action, any>[]] {
   switch (action.type) {
     case '@@redux/INIT': {
       return [state, []];
@@ -187,13 +187,36 @@ function doConvert(n: number): Promise<string> {
 
 describe(`install integration`, () => {
   test('kitchen sink', async () => {
-    expect.assertions(1);
-
-    const { enhancer } = install();
+    const { enhancer } = prepare();
 
     const store = createStore(reducer, initialState, enhancer);
 
     await store.dispatch(tagSingle(increment())); // single: 1
+    await store.dispatch(tagSingle(increment())); // single: 2
+    await store.dispatch(tagSingle(decrement())); // single: 1
+    await store.dispatch(tagDouble(increment())); // double: 1
+    await store.dispatch(tagDouble(decrement())); // double: 0
+    await store.dispatch(tagDouble(decrement())); // double: -1
+
+    expect(store.getState()).toEqual({
+      totalCount: 4,
+      singleCounter: { counter: 1, comment: 'one' },
+      doubleCounter: { counter: -1, comment: 'neg one' },
+    });
+  });
+
+  test('kitchen sink with initial commands', async () => {
+    const { enhancer } = prepare();
+
+    const initialCommnds = [Cmd.tag(tagSingle, Cmd.action(increment()))];
+
+    const store = createStore(
+      reducer,
+      [initialState, initialCommnds],
+      enhancer
+    );
+
+    // await store.dispatch(tagSingle(increment())); // single: 1
     await store.dispatch(tagSingle(increment())); // single: 2
     await store.dispatch(tagSingle(decrement())); // single: 1
     await store.dispatch(tagDouble(increment())); // double: 1

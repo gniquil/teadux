@@ -72,18 +72,10 @@ export function wrap<A, B, C, T1, T2, T3, R>(
   f3: (a: A) => B,
   f4: Func3<T1, T2, T3, A>
 ): Func3<T1, T2, T3, R>;
-
 export function wrap() {
-  if (_wrapCache.count > _wrapCache.warningThreshold) {
-    console &&
-      console.warn &&
-      console.warn(`cached item count is now at ${_wrapCache.count}`);
-  }
   const funcs: any[] = Array.prototype.slice.call(arguments);
 
-  if (funcs.length < 1) {
-    throw new Error();
-  } else if (funcs.length === 1) {
+  if (funcs.length === 1) {
     return funcs[0];
   } else if (funcs.length === 2) {
     const [func1, func2] = funcs;
@@ -116,15 +108,15 @@ export function wrap() {
     const func34 = wrap(func3, func4);
     const func234 = wrap(func2, func34);
     return wrap(func1, func234);
+  } else {
+    throw new Error('Wrapping more than 4 functions is not supported');
   }
 }
 
 export const _wrapCache: {
   cache: Map<any, Map<any, any>>;
   count: number;
-  warningThreshold: number;
 } = {
   cache: new Map(),
   count: 0,
-  warningThreshold: 300,
 };

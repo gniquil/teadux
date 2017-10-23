@@ -1,7 +1,8 @@
+import { AnyAction } from 'redux';
 import { Runtime } from './runtime';
 
-export const actionSanitizer = (action: any, runtime: Runtime<any, any>) => {
-  let joinedType: string = action.type;
+export const actionSanitizer = <A extends AnyAction>(action: A) => {
+  let joinedType = action.type;
   let currentAction = action;
   while (currentAction.subAction) {
     joinedType += ` -> ${currentAction.subAction.type}`;
@@ -9,7 +10,7 @@ export const actionSanitizer = (action: any, runtime: Runtime<any, any>) => {
   }
   if (currentAction !== action) {
     return {
-      ...action,
+      ...(action as any),
       type: joinedType,
     };
   }
@@ -26,7 +27,7 @@ export const makeStateSanitizer = (runtime: Runtime<any, any>) => (
       return {
         ...state,
         '@@teadux': {
-          type: actionSanitizer(originalAction, runtime).type,
+          type: actionSanitizer(originalAction).type,
           cmds: cmds,
         },
       };

@@ -1,11 +1,11 @@
 import { Action } from 'redux';
 
 import { Cmd } from './cmd';
-import { Commands, Dispatch, TeaReducer } from './types';
+import { Command, Dispatch, TeaReducer } from './types';
 
 export type Item<A extends Action> = {
   originalAction?: A;
-  cmds: Commands<A, any>;
+  cmds: Command<A>[];
 };
 
 export type Queue<A extends Action> = Item<A>[];

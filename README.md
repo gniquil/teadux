@@ -78,14 +78,14 @@ Reducer in teadux has the following signature:
 export interface TeaReducer<S, A extends Action, D = {}> {
   (state: S | undefined, action: A, dependencies: D, dispatch: Dispatch<A>): [
     S,
-    Command<A, any>[]
+    Command<A>[]
   ];
 }
 
 // where
 export type Dispatch<A> = (action: A) => void;
 
-export type Command<A extends Action, R> =
+export type Command<A extends Action, R=any> =
   | ActionCommand<A>
   | RunCommand<A, R>;
 ```

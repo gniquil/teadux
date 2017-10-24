@@ -1,5 +1,5 @@
 import { Action } from 'redux';
-import { Command, Commands, ActionCreator, Effect } from './types';
+import { Command, ActionCreator, Effect } from './types';
 import { actionCreator, applyActionCreator, applyEffect } from './functions';
 
 type RunOptions<A extends Action, R> = {
@@ -94,34 +94,34 @@ function fmap() {
 
 function map<A extends Action, B extends Action>(
   tagger: (subAction: B) => A,
-  nestedCmds: Commands<B, any>
-): Commands<A, any>;
+  nestedCmds: Command<B, any>[]
+): Command<A, any>[];
 function map<A extends Action, B extends Action, A1>(
   tagger: (subAction: B, a1: A1) => A,
-  nestedCmds: Commands<B, any>,
+  nestedCmds: Command<B, any>[],
   a1: A1
-): Commands<A, any>;
+): Command<A, any>[];
 function map<A extends Action, B extends Action, A1, A2>(
   tagger: (subAction: B, a1: A1, a2: A2) => A,
-  nestedCmds: Commands<B, any>,
+  nestedCmds: Command<B, any>[],
   a1: A1,
   a2: A2
-): Commands<A, any>;
+): Command<A, any>[];
 function map<A extends Action, B extends Action, A1, A2, A3>(
   tagger: (subAction: B, a1: A1, a2: A2, a3: A3) => A,
-  nestedCmds: Commands<B, any>,
+  nestedCmds: Command<B, any>[],
   a1: A1,
   a2: A2,
   a3: A3
-): Commands<A, any>;
+): Command<A, any>[];
 function map<A extends Action, B extends Action, A1, A2, A3, A4>(
   tagger: (subAction: B, a1: A1, a2: A2, a3: A3, a4: A4) => A,
-  nestedCmds: Commands<B, any>,
+  nestedCmds: Command<B, any>[],
   a1: A1,
   a2: A2,
   a3: A3,
   a4: A4
-): Commands<A, any>;
+): Command<A, any>[];
 function map() {
   const [tagger, nestedCmds, ...args] = Array.prototype.slice.call(arguments);
 

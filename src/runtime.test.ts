@@ -1,6 +1,6 @@
 import { Runtime } from './runtime';
 import { Cmd } from './cmd';
-import { Commands } from './types';
+import { Command } from './types';
 
 type State = {
   word: string;
@@ -52,7 +52,7 @@ describe('Runtime', () => {
       const reducer = (
         state: State = initialState,
         action: any
-      ): [State, Commands<any, any>] => {
+      ): [State, Command<any>[]] => {
         return [state, []];
       };
       const runtime = new Runtime({});
@@ -68,7 +68,7 @@ describe('Runtime', () => {
       const reducer = (
         state: State = initialState,
         action: any
-      ): [State, Commands<any, any>] => {
+      ): [State, Command<any>[]] => {
         return [
           state,
           [

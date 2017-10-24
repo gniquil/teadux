@@ -20,8 +20,9 @@ export type Effect<R> = {
   args: any[];
 };
 
-export type Command<A extends Action, R> = ActionCommand<A> | RunCommand<A, R>;
-export type Commands<A extends Action, R> = Command<A, R>[];
+export type Command<A extends Action, R = any> =
+  | ActionCommand<A>
+  | RunCommand<A, R>;
 
 export type ActionCommand<A extends Action> = {
   type: 'ACTION';
@@ -39,7 +40,7 @@ export type RunCommand<A extends Action, R> = {
 
 export type Dispatch<A> = (action: A) => void;
 
-export interface Store<S, A extends Action> {
+export interface TeaStore<S, A extends Action> {
   dispatch: Dispatch<A>;
   getState(): S;
   subscribe(listener: () => void): () => void;
@@ -52,4 +53,4 @@ export type TeaStoreEnhancer<S, A extends Action, D> = (
 export type TeaStoreEnhancerStoreCreator<S, A extends Action, D> = (
   reducer: TeaReducer<S, A, D>,
   preloadedState: [S, Command<A, any>[]]
-) => Store<S, A>;
+) => TeaStore<S, A>;

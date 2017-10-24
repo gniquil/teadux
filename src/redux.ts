@@ -2,17 +2,18 @@ import {
   Action,
   createStore as originalCreateStore,
   StoreEnhancerStoreCreator,
+  Store,
 } from 'redux';
 import { Runtime } from './runtime';
-import { Commands, TeaReducer, TeaStoreEnhancer, Store } from './types';
+import { Command, TeaReducer, TeaStoreEnhancer, TeaStore } from './types';
 
 export function createEnhancer<S, A extends Action, D>(
   runtime: Runtime<S, A, D>
 ): TeaStoreEnhancer<S, A, D> {
   return (next: StoreEnhancerStoreCreator<S>) => (
     reducer: TeaReducer<S, A, D>,
-    [initialModel, initialCmds]: [S, Commands<A, any>]
-  ): Store<S, A> => {
+    [initialModel, initialCmds]: [S, Command<A>[]]
+  ): TeaStore<S, A> => {
     const store = next(runtime.liftReducer(reducer), initialModel);
 
     const dispatch = (action: A) => {
@@ -36,9 +37,9 @@ export function createEnhancer<S, A extends Action, D>(
 
 export function createStore<S, A extends Action, D>(
   reducer: TeaReducer<S, A, D>,
-  preloadedState: [S, Commands<A, any>],
+  preloadedState: [S, Command<A>[]],
   enhancer: TeaStoreEnhancer<S, A, D>
-): Store<S, A> {
+): Store<S> {
   return originalCreateStore(
     reducer as any,
     preloadedState,

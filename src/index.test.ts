@@ -2,11 +2,11 @@ import {
   Runtime,
   createEnhancer,
   createStore,
+  Command,
   Cmd,
   Cmds,
   effect,
   actionCreator,
-  Commands,
   mcompose,
 } from './index';
 
@@ -56,7 +56,7 @@ function counterReducer(
   state: CounterState = initialCounterState,
   action: CounterAction,
   { convert: doConvert }: { convert: (n: number) => Promise<string> }
-): [CounterState, Commands<CounterAction, any>, CounterInfo | null] {
+): [CounterState, Command<CounterAction>[], CounterInfo | null] {
   switch (action.type) {
     case 'Increment': {
       const counter = state.counter + 1;
@@ -135,7 +135,7 @@ function reducer(
   state: State = initialState,
   action: Action,
   { convert }: Deps
-): [State, Commands<Action, any>] {
+): [State, Command<Action>[]] {
   switch (action.type) {
     case '@@redux/INIT': {
       return [state, []];

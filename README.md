@@ -15,12 +15,17 @@ This is a simple library to provide 3 things:
 
 2. Scalability
 
-  - Scale your reducer/actions via `Cmd.map` or `Cmd.tag`, by breaking down reducers
+  - Scale your reducer/actions via `Cmd.fmap` or `Cmds.fmap`, by breaking down reducers
     into fractal pattern. Factal pattern allows one to reason locally, thereby
     easier to scale.
 
   - Side effects & state are consolidated into reducer files. This overcomes the
-    one of the major short comings of `observable` and `saga`.
+    one of the major short comings of `redux-observable` and `redux-saga`.
+
+  - Dependencies are declared and passed to your reducer via the `runtime`. This
+    reduces dependencies and allows you to reason more locally. In addition,
+    mocks for dependencies can be easily passed in during testing to simulate
+    side effects.
 
 3. Type safe (as much as possible via typescript)
 

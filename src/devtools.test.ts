@@ -11,10 +11,10 @@ describe('actionSanitizer', () => {
 
   test('with subAction', () => {
     expect(
-      actionSanitizer({ type: 'SOME_ACTION', subAction: { type: 'OTHER' } })
+      actionSanitizer({ type: 'SOME_ACTION', action: { type: 'OTHER' } })
     ).toEqual({
       type: 'SOME_ACTION -> OTHER',
-      subAction: {
+      action: {
         type: 'OTHER',
       },
     });

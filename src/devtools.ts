@@ -4,9 +4,9 @@ import { Runtime } from './runtime';
 export const actionSanitizer = <A extends AnyAction>(action: A) => {
   let joinedType = action.type;
   let currentAction = action;
-  while (currentAction.subAction) {
-    joinedType += ` -> ${currentAction.subAction.type}`;
-    currentAction = currentAction.subAction;
+  while (currentAction.action) {
+    joinedType += ` -> ${currentAction.action.type}`;
+    currentAction = currentAction.action;
   }
   if (currentAction !== action) {
     return {

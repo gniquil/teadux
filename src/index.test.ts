@@ -108,20 +108,20 @@ type Action = Single | Double | Init;
 
 type Single = {
   type: 'Single';
-  subAction: CounterAction;
+  action: CounterAction;
 };
 
-function tagSingle(subAction: CounterAction): Action {
-  return { type: 'Single', subAction };
+function tagSingle(action: CounterAction): Action {
+  return { type: 'Single', action };
 }
 
 type Double = {
   type: 'Double';
-  subAction: CounterAction;
+  action: CounterAction;
 };
 
-function tagDouble(subAction: CounterAction): Action {
-  return { type: 'Double', subAction };
+function tagDouble(action: CounterAction): Action {
+  return { type: 'Double', action };
 }
 
 type Init = {
@@ -143,7 +143,7 @@ function reducer(
     case 'Single': {
       const [subState, subCmds, subInfo] = counterReducer(
         state.singleCounter,
-        action.subAction,
+        action.action,
         { convert }
       );
       return [
@@ -158,7 +158,7 @@ function reducer(
     case 'Double': {
       const [subState, subCmds, subInfo] = counterReducer(
         state.doubleCounter,
-        action.subAction,
+        action.action,
         { convert }
       );
       return [

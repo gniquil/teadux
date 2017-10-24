@@ -35,12 +35,12 @@ type FailAction = {
   extra: string;
 };
 
-type OuterAction = { type: 'OUTER'; subAction: SubAction; taggerExtra: string };
+type OuterAction = { type: 'OUTER'; action: SubAction; taggerExtra: string };
 
-function taggerFunc(subAction: SubAction, taggerExtra: string): OuterAction {
+function taggerFunc(action: SubAction, taggerExtra: string): OuterAction {
   return {
     type: 'OUTER',
-    subAction,
+    action,
     taggerExtra,
   };
 }
@@ -108,7 +108,7 @@ describe('fmap', () => {
       name: 'taggerFunc -> INNER',
       actionToDispatch: {
         type: 'OUTER',
-        subAction: {
+        action: {
           type: 'INNER',
         },
         taggerExtra: 'extra',
@@ -196,7 +196,7 @@ describe('list.fmap', () => {
         actionToDispatch: {
           type: 'OUTER',
           taggerExtra: 'tagExtra',
-          subAction: {
+          action: {
             type: 'INNER',
           },
         },
@@ -329,7 +329,7 @@ describe('execute', () => {
     expect(taggedData).toEqual({
       type: 'OUTER',
       taggerExtra: 'tagExtra',
-      subAction: {
+      action: {
         type: 'SUCCESS',
         name: 'hello world',
         extra: 'extra',
@@ -352,7 +352,7 @@ describe('execute', () => {
     expect(taggedFailData).toEqual({
       type: 'OUTER',
       taggerExtra: 'tagExtra',
-      subAction: {
+      action: {
         type: 'FAIL',
         errorMessage: 'Failed - hello world',
         extra: 'extra',

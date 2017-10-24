@@ -17,7 +17,7 @@ export const actionSanitizer = <A extends AnyAction>(action: A) => {
   return action;
 };
 
-export const makeStateSanitizer = (runtime: Runtime<any, any>) => (
+export const makeStateSanitizer = (runtime: Runtime<any, any, {}>) => (
   state: any
 ) => {
   if (runtime.isMonitoring) {

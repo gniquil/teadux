@@ -1,27 +1,34 @@
 import { Action } from 'redux';
 
 import { Cmd } from './cmd';
-import { CmdType, Dispatch } from './types';
+import { Commands, Dispatch, TeaReducer } from './types';
 
 export type Item<A extends Action> = {
   originalAction?: A;
-  cmds: CmdType<A, any>[];
+  cmds: Commands<A, any>;
 };
 
 export type Queue<A extends Action> = Item<A>[];
 
-export class Runtime<S, A extends Action> {
+export class Runtime<S, A extends Action, D> {
   queue: Queue<A> = [];
   observeQueue: Queue<A> = [];
   isMonitoring: boolean = true;
   dispatch: Dispatch<A>;
+  dependencies: D;
 
-  liftReducer(reducer: any) {
+  constructor(dependencies: D) {
+    this.dependencies = dependencies;
+  }
+
+  liftReducer(reducer: TeaReducer<S, A, D>) {
     return (state: S, action: A) => {
-      const result = reducer(state, action, this.dispatch);
-      const [model, cmds]: [S, CmdType<A, any>[]] =
-        result['length'] === 2 ? result : [result, []];
-
+      const [model, cmds] = reducer(
+        state,
+        action,
+        this.dependencies,
+        this.dispatch
+      );
       this.enqueue({ originalAction: action, cmds });
       return model;
     };

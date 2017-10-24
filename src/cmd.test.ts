@@ -1,4 +1,5 @@
-import { Cmd } from './cmd';
+import { Cmd, Cmds } from './cmd';
+import { actionCreator, effect } from './functions';
 
 function doEffect(name: string): Promise<string> {
   return Promise.resolve(name);
@@ -44,9 +45,9 @@ function taggerFunc(subAction: SubAction, taggerExtra: string): OuterAction {
   };
 }
 
-describe('Cmd.run', () => {
+describe('run', () => {
   test('without options', () => {
-    const cmd = Cmd.run(Cmd.effect(doEffect, 'hello world'));
+    const cmd = Cmd.run(effect(doEffect, 'hello world'));
     expect(cmd).toEqual({
       type: 'RUN',
       name: 'doEffect',
@@ -60,9 +61,9 @@ describe('Cmd.run', () => {
 
   test('with options', () => {
     expect(
-      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
-        fail: Cmd.actionCreator(onFail, 'extra'),
+      Cmd.run(effect(doEffect, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
+        fail: actionCreator(onFail, 'extra'),
       })
     ).toEqual({
       type: 'RUN',
@@ -86,7 +87,7 @@ describe('Cmd.run', () => {
   });
 });
 
-describe('Cmd.action', () => {
+describe('action', () => {
   test('works', () => {
     expect(Cmd.action({ type: 'HELLO' })).toEqual({
       type: 'ACTION',
@@ -98,10 +99,10 @@ describe('Cmd.action', () => {
   });
 });
 
-describe('Cmd.tag', () => {
+describe('fmap', () => {
   test('over action', () => {
     expect(
-      Cmd.tag(taggerFunc, Cmd.action({ type: 'INNER' }), 'extra')
+      Cmd.fmap(taggerFunc, Cmd.action({ type: 'INNER' }), 'extra')
     ).toEqual({
       type: 'ACTION',
       name: 'taggerFunc -> INNER',
@@ -117,11 +118,11 @@ describe('Cmd.tag', () => {
 
   test('over run', () => {
     expect(
-      Cmd.tag(
+      Cmd.fmap(
         taggerFunc,
-        Cmd.run(Cmd.effect(doEffect, 'hello world'), {
-          success: Cmd.actionCreator(onSuccess, 'extra'),
-          fail: Cmd.actionCreator(onFail, 'extra'),
+        Cmd.run(effect(doEffect, 'hello world'), {
+          success: actionCreator(onSuccess, 'extra'),
+          fail: actionCreator(onFail, 'extra'),
         }),
         'tagExtra'
       )
@@ -154,13 +155,40 @@ describe('Cmd.tag', () => {
         },
       },
     });
+    expect(
+      Cmd.fmap(
+        taggerFunc,
+        Cmd.run(effect(doEffect, 'hello world'), {
+          fail: actionCreator(onFail, 'extra'),
+        }),
+        'tagExtra'
+      )
+    ).toEqual({
+      type: 'RUN',
+      name: 'taggerFunc -> doEffect',
+      effect: {
+        name: 'doEffect',
+        func: doEffect,
+        args: ['hello world'],
+      },
+      fail: {
+        name: 'taggerFunc',
+        func: taggerFunc,
+        args: ['tagExtra'],
+        nested: {
+          name: 'onFail',
+          func: onFail,
+          args: ['extra'],
+        },
+      },
+    });
   });
 });
 
-describe('Cmd.map', () => {
+describe('list.fmap', () => {
   test('over action', () => {
     expect(
-      Cmd.map(taggerFunc, [Cmd.action({ type: 'INNER' })], 'tagExtra')
+      Cmds.fmap(taggerFunc, [Cmd.action({ type: 'INNER' })], 'tagExtra')
     ).toEqual([
       {
         type: 'ACTION',
@@ -178,12 +206,12 @@ describe('Cmd.map', () => {
 
   test('over run', () => {
     expect(
-      Cmd.map(
+      Cmds.fmap(
         taggerFunc,
         [
-          Cmd.run(Cmd.effect(doEffect, 'hello world'), {
-            success: Cmd.actionCreator(onSuccess, 'extra'),
-            fail: Cmd.actionCreator(onFail, 'extra'),
+          Cmd.run(effect(doEffect, 'hello world'), {
+            success: actionCreator(onSuccess, 'extra'),
+            fail: actionCreator(onFail, 'extra'),
           }),
         ],
         'tagExtra'
@@ -222,26 +250,24 @@ describe('Cmd.map', () => {
   });
 });
 
-describe('Cmd.execute', () => {
+describe('execute', () => {
   test('action', async () => {
-    const action = await Cmd.execute(Cmd.action({ type: 'SOMETHING' }));
+    const a = await Cmd.execute(Cmd.action({ type: 'SOMETHING' }));
 
-    expect(action).toEqual({ type: 'SOMETHING' });
+    expect(a).toEqual({ type: 'SOMETHING' });
   });
 
   test('run succeeds without action creators', async () => {
-    const data = await Cmd.execute(
-      Cmd.run(Cmd.effect(doEffect, 'hello world'))
-    );
+    const data = await Cmd.execute(Cmd.run(effect(doEffect, 'hello world')));
 
     expect(data).toEqual(undefined);
   });
 
   test('run succeeds with success/fail action creators', async () => {
     const data = await Cmd.execute(
-      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
-        fail: Cmd.actionCreator(onFail, 'extra'),
+      Cmd.run(effect(doEffect, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
+        fail: actionCreator(onFail, 'extra'),
       })
     );
 
@@ -254,9 +280,9 @@ describe('Cmd.execute', () => {
 
   test('run fails with success/fail action creators', async () => {
     const data = await Cmd.execute(
-      Cmd.run(Cmd.effect(doEffectFail, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
-        fail: Cmd.actionCreator(onFail, 'extra'),
+      Cmd.run(effect(doEffectFail, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
+        fail: actionCreator(onFail, 'extra'),
       })
     );
 
@@ -269,9 +295,9 @@ describe('Cmd.execute', () => {
 
   test('run throws with success/fail action creators', async () => {
     const data = await Cmd.execute(
-      Cmd.run(Cmd.effect(doEffectThrow, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
-        fail: Cmd.actionCreator(onFail, 'extra'),
+      Cmd.run(effect(doEffectThrow, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
+        fail: actionCreator(onFail, 'extra'),
       })
     );
 
@@ -284,16 +310,16 @@ describe('Cmd.execute', () => {
 
   test('run fails without success/fail action creators', () => {
     expect.assertions(1);
-    Cmd.execute(Cmd.run(Cmd.effect(doEffectFail, 'hello world'))).then(result =>
+    Cmd.execute(Cmd.run(effect(doEffectFail, 'hello world'))).then(result =>
       expect(result).toBe(undefined)
     );
   });
 
   test('tagged run succeeds with success/fail action creators', async () => {
-    const taggedCmd = Cmd.tag(
+    const taggedCmd = Cmd.fmap(
       taggerFunc,
-      Cmd.run(Cmd.effect(doEffect, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
+      Cmd.run(effect(doEffect, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
       }),
       'tagExtra'
     );
@@ -312,11 +338,11 @@ describe('Cmd.execute', () => {
   });
 
   test('tagged run fails with success/fail action creators', async () => {
-    const taggedCmdFail = Cmd.tag(
+    const taggedCmdFail = Cmd.fmap(
       taggerFunc,
-      Cmd.run(Cmd.effect(doEffectFail, 'hello world'), {
-        success: Cmd.actionCreator(onSuccess, 'extra'),
-        fail: Cmd.actionCreator(onFail, 'extra'),
+      Cmd.run(effect(doEffectFail, 'hello world'), {
+        success: actionCreator(onSuccess, 'extra'),
+        fail: actionCreator(onFail, 'extra'),
       }),
       'tagExtra'
     );

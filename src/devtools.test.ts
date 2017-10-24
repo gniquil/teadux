@@ -23,7 +23,7 @@ describe('actionSanitizer', () => {
 
 describe('makeStateSanitizer', () => {
   test('when runtime monitoring is off', async () => {
-    const runtime = new Runtime();
+    const runtime = new Runtime({});
     runtime.isMonitoring = false;
     runtime.init(() => {}, { cmds: [] });
     runtime.enqueue({
@@ -39,7 +39,7 @@ describe('makeStateSanitizer', () => {
   });
 
   test('when runtime monitoring is on, runtime item exists', async () => {
-    const runtime = new Runtime();
+    const runtime = new Runtime({});
     runtime.init(() => {}, { cmds: [] });
     runtime.enqueue({
       originalAction: { type: 'SOME_ACTION' },
@@ -60,7 +60,7 @@ describe('makeStateSanitizer', () => {
   });
 
   test('when runtime monitoring is on, runtime item does not exist', async () => {
-    const runtime = new Runtime();
+    const runtime = new Runtime({});
     runtime.init(() => {}, { cmds: [] });
 
     await runtime.runAll(runtime.dequeueAll());

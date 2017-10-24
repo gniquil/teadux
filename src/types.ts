@@ -1,9 +1,9 @@
-import { Action } from 'redux';
+import { Action, StoreEnhancerStoreCreator, Reducer } from 'redux';
 
-export interface TeaReducer<S, A extends Action> {
-  (state: S | undefined, action: A, dispatch: Dispatch<A>): [
+export interface TeaReducer<S, A extends Action, D = {}> {
+  (state: S | undefined, action: A, dependencies: D, dispatch: Dispatch<A>): [
     S,
-    CmdType<A, any>[]
+    Command<A, any>[]
   ];
 }
 
@@ -20,15 +20,16 @@ export type Effect<R> = {
   args: any[];
 };
 
-export type CmdType<A extends Action, R> = ActionCmd<A> | RunCmd<A, R>;
+export type Command<A extends Action, R> = ActionCommand<A> | RunCommand<A, R>;
+export type Commands<A extends Action, R> = Command<A, R>[];
 
-export type ActionCmd<A extends Action> = {
+export type ActionCommand<A extends Action> = {
   type: 'ACTION';
   actionToDispatch: A;
   name: string;
 };
 
-export type RunCmd<A extends Action, R> = {
+export type RunCommand<A extends Action, R> = {
   type: 'RUN';
   name: string;
   effect: Effect<R>;
@@ -37,3 +38,18 @@ export type RunCmd<A extends Action, R> = {
 };
 
 export type Dispatch<A> = (action: A) => void;
+
+export interface Store<S, A extends Action> {
+  dispatch: Dispatch<A>;
+  getState(): S;
+  subscribe(listener: () => void): () => void;
+  replaceReducer(nextReducer: Reducer<S>): void;
+}
+export type TeaStoreEnhancer<S, A extends Action, D> = (
+  next: StoreEnhancerStoreCreator<S>
+) => TeaStoreEnhancerStoreCreator<S, A, D>;
+
+export type TeaStoreEnhancerStoreCreator<S, A extends Action, D> = (
+  reducer: TeaReducer<S, A, D>,
+  preloadedState: [S, Command<A, any>[]]
+) => Store<S, A>;

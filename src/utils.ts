@@ -11,84 +11,87 @@ export type Func3<T1, T2, T3, R> = (
 ) => R;
 
 /* one functions */
-export function wrap<F extends Function>(f: F): F;
+export function mcompose<F extends Function>(f: F): F;
 
 /* two functions */
-export function wrap<A, R>(f1: (b: A) => R, f2: Func0<A>): Func0<R>;
-export function wrap<A, T1, R>(f1: (b: A) => R, f2: Func1<T1, A>): Func1<T1, R>;
-export function wrap<A, T1, T2, R>(
-  f1: (b: A) => R,
+export function mcompose<A, R>(f1: (a: A) => R, f2: Func0<A>): Func0<R>;
+export function mcompose<A, T1, R>(
+  f1: (a: A) => R,
+  f2: Func1<T1, A>
+): Func1<T1, R>;
+export function mcompose<A, T1, T2, R>(
+  f1: (a: A) => R,
   f2: Func2<T1, T2, A>
 ): Func2<T1, T2, R>;
-export function wrap<A, T1, T2, T3, R>(
-  f1: (b: A) => R,
+export function mcompose<A, T1, T2, T3, R>(
+  f1: (a: A) => R,
   f2: Func3<T1, T2, T3, A>
 ): Func3<T1, T2, T3, R>;
 
 /* three functions */
-export function wrap<A, B, R>(
+export function mcompose<A, B, R>(
   f1: (b: B) => R,
   f2: (a: A) => B,
   f3: Func0<A>
 ): Func0<R>;
-export function wrap<A, B, T1, R>(
+export function mcompose<A, B, T1, R>(
   f1: (b: B) => R,
   f2: (a: A) => B,
   f3: Func1<T1, A>
 ): Func1<T1, R>;
-export function wrap<A, B, T1, T2, R>(
+export function mcompose<A, B, T1, T2, R>(
   f1: (b: B) => R,
   f2: (a: A) => B,
   f3: Func2<T1, T2, A>
 ): Func2<T1, T2, R>;
-export function wrap<A, B, T1, T2, T3, R>(
+export function mcompose<A, B, T1, T2, T3, R>(
   f1: (b: B) => R,
   f2: (a: A) => B,
   f3: Func3<T1, T2, T3, A>
 ): Func3<T1, T2, T3, R>;
 
 /* four functions */
-export function wrap<A, B, C, R>(
-  f1: (b: C) => R,
-  f2: (a: B) => C,
+export function mcompose<A, B, C, R>(
+  f1: (c: C) => R,
+  f2: (b: B) => C,
   f3: (a: A) => B,
   f4: Func0<A>
 ): Func0<R>;
-export function wrap<A, B, C, T1, R>(
-  f1: (b: C) => R,
-  f2: (a: B) => C,
+export function mcompose<A, B, C, T1, R>(
+  f1: (c: C) => R,
+  f2: (b: B) => C,
   f3: (a: A) => B,
   f4: Func1<T1, A>
 ): Func1<T1, R>;
-export function wrap<A, B, C, T1, T2, R>(
-  f1: (b: C) => R,
-  f2: (a: B) => C,
+export function mcompose<A, B, C, T1, T2, R>(
+  f1: (c: C) => R,
+  f2: (b: B) => C,
   f3: (a: A) => B,
   f4: Func2<T1, T2, A>
 ): Func2<T1, T2, R>;
-export function wrap<A, B, C, T1, T2, T3, R>(
-  f1: (b: C) => R,
-  f2: (a: B) => C,
+export function mcompose<A, B, C, T1, T2, T3, R>(
+  f1: (c: C) => R,
+  f2: (b: B) => C,
   f3: (a: A) => B,
   f4: Func3<T1, T2, T3, A>
 ): Func3<T1, T2, T3, R>;
-export function wrap() {
+export function mcompose() {
   const funcs: any[] = Array.prototype.slice.call(arguments);
 
   if (funcs.length === 1) {
     return funcs[0];
   } else if (funcs.length === 2) {
     const [func1, func2] = funcs;
-    let func1Cache = _wrapCache.cache.get(func1);
+    let func1Cache = _composeCache.cache.get(func1);
     if (!func1Cache) {
       func1Cache = new Map();
-      _wrapCache.count = _wrapCache.count + 1;
-      _wrapCache.cache.set(func1, func1Cache);
+      _composeCache.count = _composeCache.count + 1;
+      _composeCache.cache.set(func1, func1Cache);
     }
     let func12 = func1Cache.get(func2);
     if (!func12) {
       func12 = compose(func1, func2);
-      _wrapCache.count = _wrapCache.count + 1;
+      _composeCache.count = _composeCache.count + 1;
       func1Cache.set(func2, func12);
     }
     return func12;
@@ -101,19 +104,19 @@ export function wrap() {
       ```
     */
     const [func1, func2, func3] = funcs;
-    const func23 = wrap(func2, func3);
-    return wrap(func1, func23);
+    const func23 = mcompose(func2, func3);
+    return mcompose(func1, func23);
   } else if (funcs.length === 4) {
     const [func1, func2, func3, func4] = funcs;
-    const func34 = wrap(func3, func4);
-    const func234 = wrap(func2, func34);
-    return wrap(func1, func234);
+    const func34 = mcompose(func3, func4);
+    const func234 = mcompose(func2, func34);
+    return mcompose(func1, func234);
   } else {
     throw new Error('Wrapping more than 4 functions is not supported');
   }
 }
 
-export const _wrapCache: {
+export const _composeCache: {
   cache: Map<any, Map<any, any>>;
   count: number;
 } = {

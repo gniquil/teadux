@@ -1,64 +1,47 @@
 import {
   Action,
-  StoreEnhancer,
-  StoreEnhancerStoreCreator,
-  Reducer,
-  Store,
   createStore as originalCreateStore,
+  StoreEnhancerStoreCreator,
 } from 'redux';
 import { Runtime } from './runtime';
-import { CmdType, TeaReducer } from './types';
+import { Commands, TeaReducer, TeaStoreEnhancer, Store } from './types';
 
-export const prepare = <S, A extends Action>(
-  providedRuntime?: Runtime<S, A>
-): { runtime: Runtime<S, A>; enhancer: StoreEnhancer<S> } => {
-  const runtime: Runtime<S, A> = providedRuntime
-    ? providedRuntime
-    : new Runtime();
-  return {
-    runtime,
-    enhancer: (next: StoreEnhancerStoreCreator<S>) => (
-      reducer: Reducer<S>,
-      preloadedState?: S | [S, CmdType<A, any>[]]
-    ): Store<S> => {
-      let initialModel: S | undefined = undefined;
-      let initialCmds: CmdType<A, any>[] = [];
+export function createEnhancer<S, A extends Action, D>(
+  runtime: Runtime<S, A, D>
+): TeaStoreEnhancer<S, A, D> {
+  return (next: StoreEnhancerStoreCreator<S>) => (
+    reducer: TeaReducer<S, A, D>,
+    [initialModel, initialCmds]: [S, Commands<A, any>]
+  ): Store<S, A> => {
+    const store = next(runtime.liftReducer(reducer), initialModel);
 
-      if (preloadedState) {
-        if (preloadedState['length'] === 2) {
-          initialModel = preloadedState[0];
-          initialCmds = preloadedState[1];
-        } else {
-          initialModel = preloadedState as S;
-        }
-      }
+    const dispatch = (action: A) => {
+      store.dispatch(action);
+      return runtime.runAll(runtime.dequeueAll());
+    };
 
-      const store = next(runtime.liftReducer(reducer), initialModel);
+    const replaceReducer = (reducer: TeaReducer<S, A, D>) => {
+      return store.replaceReducer(runtime.liftReducer(reducer));
+    };
 
-      const dispatch = (action: A) => {
-        store.dispatch(action);
-        return runtime.runAll(runtime.dequeueAll());
-      };
+    runtime.init(dispatch, { cmds: initialCmds });
 
-      const replaceReducer = (reducer: Reducer<S>) => {
-        return store.replaceReducer(runtime.liftReducer(reducer));
-      };
-
-      runtime.init(dispatch, { cmds: initialCmds });
-
-      return {
-        ...store,
-        dispatch,
-        replaceReducer,
-      } as any;
-    },
+    return {
+      ...store,
+      dispatch,
+      replaceReducer,
+    } as any;
   };
-};
+}
 
-export function createStore<S, A extends Action>(
-  reducer: TeaReducer<S, A>,
-  preloadedState: S,
-  enhancer?: StoreEnhancer<S>
-): Store<S> {
-  return originalCreateStore(reducer as any, preloadedState, enhancer);
+export function createStore<S, A extends Action, D>(
+  reducer: TeaReducer<S, A, D>,
+  preloadedState: [S, Commands<A, any>],
+  enhancer: TeaStoreEnhancer<S, A, D>
+): Store<S, A> {
+  return originalCreateStore(
+    reducer as any,
+    preloadedState,
+    enhancer as any
+  ) as any;
 }

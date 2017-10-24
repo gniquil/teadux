@@ -1,4 +1,14 @@
-import { prepare, createStore, Cmd, CmdType } from './index';
+import {
+  Runtime,
+  createEnhancer,
+  createStore,
+  Cmd,
+  Cmds,
+  effect,
+  actionCreator,
+  Commands,
+  mcompose,
+} from './index';
 
 //#region sample setup
 
@@ -44,16 +54,17 @@ type CounterInfo = {
 
 function counterReducer(
   state: CounterState = initialCounterState,
-  action: CounterAction
-): [CounterState, CmdType<CounterAction, any>[], CounterInfo | null] {
+  action: CounterAction,
+  { convert: doConvert }: { convert: (n: number) => Promise<string> }
+): [CounterState, Commands<CounterAction, any>, CounterInfo | null] {
   switch (action.type) {
     case 'Increment': {
       const counter = state.counter + 1;
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.effect(doConvert, counter), {
-            success: Cmd.actionCreator(update),
+          Cmd.run(effect(doConvert, counter), {
+            success: actionCreator(update),
           }),
         ],
         { current: counter },
@@ -64,8 +75,8 @@ function counterReducer(
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.effect(doConvert, counter), {
-            success: Cmd.actionCreator(update),
+          Cmd.run(effect(doConvert, counter), {
+            success: actionCreator(update),
           }),
         ],
         { current: counter },
@@ -117,10 +128,14 @@ type Init = {
   type: '@@redux/INIT';
 };
 
+type Deps = {
+  convert: (n: number) => Promise<string>;
+};
 function reducer(
   state: State = initialState,
-  action: Action
-): [State, CmdType<Action, any>[]] {
+  action: Action,
+  { convert }: Deps
+): [State, Commands<Action, any>] {
   switch (action.type) {
     case '@@redux/INIT': {
       return [state, []];
@@ -128,7 +143,8 @@ function reducer(
     case 'Single': {
       const [subState, subCmds, subInfo] = counterReducer(
         state.singleCounter,
-        action.subAction
+        action.subAction,
+        { convert }
       );
       return [
         {
@@ -136,13 +152,14 @@ function reducer(
           singleCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmd.map(tagSingle, subCmds)],
+        [...Cmds.fmap(tagSingle, subCmds)],
       ];
     }
     case 'Double': {
       const [subState, subCmds, subInfo] = counterReducer(
         state.doubleCounter,
-        action.subAction
+        action.subAction,
+        { convert }
       );
       return [
         {
@@ -150,13 +167,13 @@ function reducer(
           doubleCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmd.map(tagDouble, subCmds)],
+        [...Cmds.fmap(tagDouble, subCmds)],
       ];
     }
   }
 }
 
-function doConvert(n: number): Promise<string> {
+function convert(n: number): Promise<string> {
   switch (n) {
     case 0:
       return Promise.resolve('zero');
@@ -185,18 +202,27 @@ function doConvert(n: number): Promise<string> {
 
 //#endregion
 
-describe(`install integration`, () => {
+describe('redux integration', () => {
   test('kitchen sink', async () => {
-    const { enhancer } = prepare();
+    const runtime = new Runtime<State, Action, Deps>({ convert });
 
-    const store = createStore(reducer, initialState, enhancer);
+    const store = createStore(
+      reducer,
+      [initialState, []],
+      createEnhancer(runtime)
+    );
 
-    await store.dispatch(tagSingle(increment())); // single: 1
-    await store.dispatch(tagSingle(increment())); // single: 2
-    await store.dispatch(tagSingle(decrement())); // single: 1
-    await store.dispatch(tagDouble(increment())); // double: 1
-    await store.dispatch(tagDouble(decrement())); // double: 0
-    await store.dispatch(tagDouble(decrement())); // double: -1
+    const incrementSingle = mcompose(store.dispatch, tagSingle, increment);
+    const decrementSingle = mcompose(store.dispatch, tagSingle, decrement);
+    const incrementDouble = mcompose(store.dispatch, tagDouble, increment);
+    const decrementDouble = mcompose(store.dispatch, tagDouble, decrement);
+
+    await incrementSingle(); // single: 1
+    await incrementSingle(); // single: 2
+    await decrementSingle(); // single: 1
+    await incrementDouble(); // double: 1
+    await decrementDouble(); // double: 0
+    await decrementDouble(); // double: -1
 
     expect(store.getState()).toEqual({
       totalCount: 4,
@@ -206,22 +232,26 @@ describe(`install integration`, () => {
   });
 
   test('kitchen sink with initial commands', async () => {
-    const { enhancer } = prepare();
-
-    const initialCommnds = [Cmd.tag(tagSingle, Cmd.action(increment()))];
+    const runtime = new Runtime<State, Action, Deps>({ convert });
+    const initialCommnds = [Cmd.fmap(tagSingle, Cmd.action(increment()))];
 
     const store = createStore(
       reducer,
       [initialState, initialCommnds],
-      enhancer
+      createEnhancer(runtime)
     );
 
-    // await store.dispatch(tagSingle(increment())); // single: 1
-    await store.dispatch(tagSingle(increment())); // single: 2
-    await store.dispatch(tagSingle(decrement())); // single: 1
-    await store.dispatch(tagDouble(increment())); // double: 1
-    await store.dispatch(tagDouble(decrement())); // double: 0
-    await store.dispatch(tagDouble(decrement())); // double: -1
+    const incrementSingle = mcompose(store.dispatch, tagSingle, increment);
+    const decrementSingle = mcompose(store.dispatch, tagSingle, decrement);
+    const incrementDouble = mcompose(store.dispatch, tagDouble, increment);
+    const decrementDouble = mcompose(store.dispatch, tagDouble, decrement);
+
+    // await incrementSingle(); // single: 1
+    await incrementSingle(); // single: 2
+    await decrementSingle(); // single: 1
+    await incrementDouble(); // double: 1
+    await decrementDouble(); // double: 0
+    await decrementDouble(); // double: -1
 
     expect(store.getState()).toEqual({
       totalCount: 4,

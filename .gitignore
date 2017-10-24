@@ -3,3 +3,4 @@ dist
 bundles
 yarn-error.log
 npm-debug.log
+coverage

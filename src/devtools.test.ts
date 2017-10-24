@@ -1,20 +1,23 @@
 import { Cmd } from './cmd';
 import { Runtime } from './runtime';
-import { actionSanitizer, makeStateSanitizer } from './devtools';
+import { makeSanitizers } from './devtools';
 
 describe('actionSanitizer', () => {
   test('without subAction', () => {
+    const { actionSanitizer } = makeSanitizers({} as any, 'nested');
     expect(actionSanitizer({ type: 'SOME_ACTION' })).toEqual({
       type: 'SOME_ACTION',
     });
   });
 
   test('with subAction', () => {
+    const { actionSanitizer } = makeSanitizers({} as any, 'nested');
+
     expect(
-      actionSanitizer({ type: 'SOME_ACTION', action: { type: 'OTHER' } })
+      actionSanitizer({ type: 'SOME_ACTION', nested: { type: 'OTHER' } })
     ).toEqual({
       type: 'SOME_ACTION -> OTHER',
-      action: {
+      nested: {
         type: 'OTHER',
       },
     });
@@ -33,9 +36,9 @@ describe('makeStateSanitizer', () => {
 
     await runtime.runAll(runtime.dequeueAll());
 
-    const actionSanitizer = makeStateSanitizer(runtime);
-    const result = actionSanitizer({ word: 'hello' });
-    expect(result).toEqual({ word: 'hello' });
+    const { actionSanitizer } = makeSanitizers(runtime, 'nested');
+    const result = actionSanitizer({ type: 'hello' });
+    expect(result).toEqual({ type: 'hello' });
   });
 
   test('when runtime monitoring is on, runtime item exists', async () => {
@@ -48,8 +51,8 @@ describe('makeStateSanitizer', () => {
 
     await runtime.runAll(runtime.dequeueAll());
 
-    const actionSanitizer = makeStateSanitizer(runtime);
-    const result = actionSanitizer({ word: 'hello' });
+    const { stateSanitizer } = makeSanitizers(runtime, 'nested');
+    const result = stateSanitizer({ word: 'hello' });
     expect(result).toEqual({
       word: 'hello',
       '@@teadux': {
@@ -65,8 +68,8 @@ describe('makeStateSanitizer', () => {
 
     await runtime.runAll(runtime.dequeueAll());
 
-    const actionSanitizer = makeStateSanitizer(runtime);
-    const result = actionSanitizer({ word: 'hello' });
+    const { stateSanitizer } = makeSanitizers(runtime, 'nested');
+    const result = stateSanitizer({ word: 'hello' });
     expect(result).toEqual({
       word: 'hello',
       '@@teadux': {},

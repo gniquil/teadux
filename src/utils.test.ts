@@ -22,38 +22,38 @@ type Action = Single;
 
 type Single = {
   type: 'Single';
-  subAction: CounterAction;
+  action: CounterAction;
 };
 
 type Double = {
   type: 'Double';
-  subAction: Single;
+  action: Single;
 };
 
 type Triple = {
   type: 'Triple';
-  subAction: Double;
+  action: Double;
 };
 
 type Quad = {
   type: 'Quad';
-  subAction: Triple;
+  action: Triple;
 };
 
-function tagSingle(subAction: CounterAction): Action {
-  return { type: 'Single', subAction };
+function tagSingle(action: CounterAction): Action {
+  return { type: 'Single', action };
 }
 
-function tagDouble(subAction: Single): Double {
-  return { type: 'Double', subAction };
+function tagDouble(action: Single): Double {
+  return { type: 'Double', action };
 }
 
-function tagTriple(subAction: Double): Triple {
-  return { type: 'Triple', subAction };
+function tagTriple(action: Double): Triple {
+  return { type: 'Triple', action };
 }
 
-function tagQuad(subAction: Triple): Quad {
-  return { type: 'Quad', subAction };
+function tagQuad(action: Triple): Quad {
+  return { type: 'Quad', action };
 }
 
 describe('wrap', () => {

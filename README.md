@@ -15,7 +15,7 @@ This is a simple library to provide 3 things:
 
 2. Scalability
 
-  - Scale your reducer/actions via `Cmd.fmap` or `Cmds.fmap`, by breaking down reducers
+  - Scale your reducer/actions via `Cmd.fmap` or `Cmd.list.fmap`, by breaking down reducers
     into fractal pattern. Factal pattern allows one to reason locally, thereby
     easier to scale.
 
@@ -42,9 +42,8 @@ import {
   createStore,
   Runtime,
   createEnhancer,
-  compose
-  actionSanitizer,
-  makeStateSanitizer,
+  mcompose
+  makeSanitizers,
 } from 'teadux'
 
 // enhancer enqueues commands from your reducers into your runtime
@@ -52,12 +51,14 @@ import {
 const deps: Deps = { queryData, mutateData }
 const teaRuntime = new Runtime<State, Action, Deps>(deps)
 
+const {actionSanitizer, stateSanitizer} = makeSanitizers(teaRuntime, 'subAction')
+
 // with the following you can see a `@@cmds` key in the STATE panel of the
 // redux devtool, as well as actions formatted as `POSTS -> NEW_MESSAGE -> SUBMIT`
 const composeEnhancers = windowIfDefined.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? windowIfDefined.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-        actionSanitizer: actionSanitizer,
-        stateSanitizer: makeStateSanitizer(teaRuntime),
+        actionSanitizer,
+        stateSanitizer,
       })
     : compose;
 

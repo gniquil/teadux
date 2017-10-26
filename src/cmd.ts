@@ -159,8 +159,7 @@ export const Cmd = {
   action,
   fmap,
   execute,
-};
-
-export const Cmds = {
-  fmap: map,
+  list: {
+    fmap: map,
+  },
 };

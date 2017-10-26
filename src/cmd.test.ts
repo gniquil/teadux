@@ -1,4 +1,4 @@
-import { Cmd, Cmds } from './cmd';
+import { Cmd } from './cmd';
 import { actionCreator, effect } from './functions';
 
 function doEffect(name: string): Promise<string> {
@@ -188,7 +188,7 @@ describe('fmap', () => {
 describe('list.fmap', () => {
   test('over action', () => {
     expect(
-      Cmds.fmap(taggerFunc, [Cmd.action({ type: 'INNER' })], 'tagExtra')
+      Cmd.list.fmap(taggerFunc, [Cmd.action({ type: 'INNER' })], 'tagExtra')
     ).toEqual([
       {
         type: 'ACTION',
@@ -206,7 +206,7 @@ describe('list.fmap', () => {
 
   test('over run', () => {
     expect(
-      Cmds.fmap(
+      Cmd.list.fmap(
         taggerFunc,
         [
           Cmd.run(effect(doEffect, 'hello world'), {

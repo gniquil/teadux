@@ -4,7 +4,6 @@ import {
   createStore,
   Command,
   Cmd,
-  Cmds,
   effect,
   actionCreator,
   mcompose,
@@ -152,7 +151,7 @@ function reducer(
           singleCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmds.fmap(tagSingle, subCmds)],
+        [...Cmd.list.fmap(tagSingle, subCmds)],
       ];
     }
     case 'Double': {
@@ -167,7 +166,7 @@ function reducer(
           doubleCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmds.fmap(tagDouble, subCmds)],
+        [...Cmd.list.fmap(tagDouble, subCmds)],
       ];
     }
   }

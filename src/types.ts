@@ -16,7 +16,7 @@ export type ActionCreator<A, R> = {
 
 export type Effect<R> = {
   name: string;
-  func: (...args: any[]) => Promise<R>;
+  func: (...args: any[]) => R | Promise<R>;
   args: any[];
 };
 

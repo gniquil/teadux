@@ -1,7 +1,7 @@
 import { Effect, ActionCreator } from './types';
 
 export function applyEffect<R>({ args, func }: Effect<R>): Promise<R> {
-  return func(...args);
+  return Promise.resolve(func(...args));
 }
 
 export function applyActionCreator<R, A>(
